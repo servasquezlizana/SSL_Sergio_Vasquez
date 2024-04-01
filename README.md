@@ -1,3 +1,3 @@
-# SSL_Jurado_Romina
-# Repositorio para la cursada de Sintaxis y Semantica de Lenguajes 2024
+# SSL_Sergio_Vasquez
+# Repositorio para SSL 2024
  
