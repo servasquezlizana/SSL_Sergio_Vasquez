@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 int tabla_estados[][25] = {
 {1,2,2,2,2,2,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6},
@@ -21,8 +22,10 @@ int posicion_alfabeto(char c);
 
 //MAIN
 int main(int argc, char **args){
-    FILE *prueba = fopen("prueba.txt","r");
-    FILE *salida = fopen("salida.txt","wb");
+    FILE *prueba;
+    FILE *salida;
+    prueba = fopen("../src/prueba.txt","rt");
+    salida = fopen("../src/salida.txt","a+t");
     if(prueba == NULL){
         printf("Error al iniciar prueba, compruebe que exista el archivo\n");
         return 0;
@@ -47,13 +50,21 @@ int posicion_alfabeto(char c){
         if(alfabeto[i] == c){
             return i;}
     }
-    return 25;
+    return 0;
+}
+
+int caracter_alfabeto(char c){
+    for(int i = 0; i < long_alfabeto; i++){
+        if(alfabeto[i] == c){
+            return 1;}
+    }
+    return 0;
 }
 
 //Evaluo si el simbolo final coresponde a un Estado Final
 int es_final(int estado){
-    int i;
-    for (i = 0; i < cant_finales; i++){
+
+    for (int i = 0; i < cant_finales; i++){
         if(estado == estados_finales[i])
             return estado;
     }
@@ -62,31 +73,33 @@ int es_final(int estado){
 
 //AUTOMATA, SE RECORRE LA TABLA DE ESTADOS Y SE DEVUELVE EL VALOR EN LA POSICION Aij, i=estado j=ordinal del caracter
 int automata(FILE *prueba,FILE *salida){
+    //int estado = 0;
+    char letra;
     int estado = 0;
-    char palabra;
-    while((fscanf(prueba,",",palabra)) != EOF){ //getc(stdin) recorre la palabra ingresada (stdin) caracter a caracter hasta que reconoce un salto de linea
-       printf("%s",palabra);
-       char letra[] = palabra;
-       for (int i = 0; i < strlen(letra); i++){
-        estado = tabla_estados[estado][posicion_alfabeto(letra)];
-       }
-       switch (es_final(estado)){//reconosco si estado es un estado final
-        case 1:
-            fwrite(palabra + "      OCTAL\n",sizeof(int),1,salida);
-            break;
-        case 2:
-            fwrite(palabra + "      DECIMAL\n",sizeof(int),1,salida);
-            break;
-        case 4:
-            fwrite(palabra + "      HEXADECIMAL\n",sizeof(int),1,salida);
-            break;
-        case 5:
-            fwrite(palabra + "      OCTAL\n",sizeof(int),1,salida);
-            break;
-        default:
-            fwrite(palabra + "      NO RECONOCE LA CADENA\n",sizeof(int),1,salida);
-            break;
+    while(!feof(prueba)){ //getc(stdin) recorre la palabra ingresada (stdin) caracter a caracter hasta que reconoce un salto de linea
+        while(caracter_alfabeto(letra = fgetc(prueba))){
+            estado = tabla_estados[estado][posicion_alfabeto(letra)];
+            fputc(letra,salida);
         }
+        //printf("%s",letra);
+        switch (es_final(estado)){//reconosco si estado es un estado final
+            case 1:
+                fputs("         OCTAL/n",salida);
+                break;
+            case 2:
+                fputs("         DECIMAL/n",salida);
+                break;
+            case 4:
+                fputs("         HEXADECIMAL/n",salida);
+                break;
+            case 5:
+                fputs("         OCTAL/n",salida);
+                break;
+            default:
+                fputs("         NO RECONOCE LA CADENA/n",salida);
+                break;
+        }
+        
     }
-    return -1; 
+    return 0; 
 }
